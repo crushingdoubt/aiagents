@@ -48,13 +48,13 @@ export default async function SubmitPage({
               name="description"
               rows={5}
               required
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 shadow-sm outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 font-medium text-white shadow-sm transition hover:bg-indigo-500"
+            className="w-full rounded-lg bg-red-600 px-4 py-2.5 font-medium text-white shadow-sm transition hover:bg-red-500"
           >
             Submit ticket
           </button>
@@ -86,7 +86,7 @@ function Field({
         name={name}
         type={type}
         required
-        className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+        className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 shadow-sm outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
       />
     </div>
   );

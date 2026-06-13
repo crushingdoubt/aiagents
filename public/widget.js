@@ -19,7 +19,8 @@
   var base = new URL(self.src); // e.g. https://host/cd/widget.js
   var apiUrl = base.origin + base.pathname.replace(/\/widget\.js.*$/, "") + "/api/tickets";
 
-  var BRAND = "#4f46e5"; // indigo-600
+  var BRAND = "#dc2626"; // red-600
+  var BRAND_DARK = "#111111"; // near-black header
 
   // Guard against double-injection.
   if (window.__cdSupportWidget) return;
@@ -35,15 +36,17 @@
     ".cd-panel{position:fixed;bottom:78px;right:20px;z-index:2147483000;width:320px;max-width:calc(100vw - 40px);background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.25);overflow:hidden;font:14px/1.4 system-ui,sans-serif;display:none}" +
     ".cd-panel.open{display:block}" +
     ".cd-head{background:" +
+    BRAND_DARK +
+    ";color:#fff;padding:14px 16px;font-weight:600;border-bottom:3px solid " +
     BRAND +
-    ";color:#fff;padding:14px 16px;font-weight:600}" +
+    "}" +
     ".cd-head small{display:block;font-weight:400;opacity:.85;font-size:12px;margin-top:2px}" +
     ".cd-body{padding:14px 16px}" +
     ".cd-body label{display:block;font-size:12px;font-weight:600;color:#3f3f46;margin:8px 0 4px}" +
     ".cd-body input,.cd-body textarea{width:100%;box-sizing:border-box;border:1px solid #d4d4d8;border-radius:8px;padding:8px 10px;font:14px system-ui,sans-serif;outline:none}" +
     ".cd-body input:focus,.cd-body textarea:focus{border-color:" +
     BRAND +
-    ";box-shadow:0 0 0 3px rgba(79,70,229,.18)}" +
+    ";box-shadow:0 0 0 3px rgba(220,38,38,.18)}" +
     ".cd-send{margin-top:12px;width:100%;background:" +
     BRAND +
     ";color:#fff;border:none;border-radius:8px;padding:10px;font:600 14px system-ui,sans-serif;cursor:pointer}" +

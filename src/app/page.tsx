@@ -4,10 +4,10 @@ export default function Home() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-10 bg-zinc-50 px-6 py-24 text-center">
       <div className="space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-widest text-indigo-600">
+        <p className="text-sm font-semibold uppercase tracking-widest text-red-600">
           Crushing Doubt
         </p>
-        <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 sm:text-5xl">
+        <h1 className="text-4xl font-bold tracking-tight text-black sm:text-5xl">
           Support Desk
         </h1>
         <p className="mx-auto max-w-md text-lg text-zinc-600">
@@ -19,7 +19,7 @@ export default function Home() {
       <div className="flex flex-col gap-3 sm:flex-row">
         <Link
           href="/submit"
-          className="rounded-lg bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm transition hover:bg-indigo-500"
+          className="rounded-lg bg-red-600 px-6 py-3 text-base font-medium text-white shadow-sm transition hover:bg-red-500"
         >
           Submit a ticket
         </Link>

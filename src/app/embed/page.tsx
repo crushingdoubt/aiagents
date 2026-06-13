@@ -29,7 +29,7 @@ export default function EmbedPage() {
           👉 The live widget is already loaded on this page — look in the
           bottom-right corner and try sending a message. New tickets show up on
           the{" "}
-          <Link href="/dashboard" className="text-indigo-600 underline">
+          <Link href="/dashboard" className="text-red-600 underline">
             dashboard
           </Link>
           .
