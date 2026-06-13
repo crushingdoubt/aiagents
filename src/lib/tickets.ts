@@ -1,6 +1,8 @@
-// In-memory mock ticket store for the demo build (no database yet).
-// Data resets when the dev server restarts — that's expected for the prototype.
-// When we wire up Supabase, this file is the single place that changes.
+// Mock ticket store for the demo build (no database yet). Backed by a local
+// JSON file so all Next.js dev workers share the same data and it survives
+// restarts. When we wire up Supabase, this file is the single place that changes.
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
 export type TicketStatus = "open" | "closed";
 
@@ -47,14 +49,40 @@ const seed: Ticket[] = [
   },
 ];
 
-// Module-level array persists across requests within a single server process.
-const tickets: Ticket[] = [...seed];
+// JSON file is the shared source of truth across all dev workers.
+const DATA_DIR = join(process.cwd(), ".data");
+const DATA_FILE = join(DATA_DIR, "tickets.json");
 
-let counter = 1004;
+function readAll(): Ticket[] {
+  try {
+    if (!existsSync(DATA_FILE)) {
+      // First run — seed the file so the dashboard looks real.
+      mkdirSync(DATA_DIR, { recursive: true });
+      writeFileSync(DATA_FILE, JSON.stringify(seed, null, 2));
+      return [...seed];
+    }
+    return JSON.parse(readFileSync(DATA_FILE, "utf8")) as Ticket[];
+  } catch {
+    return [...seed];
+  }
+}
+
+function writeAll(tickets: Ticket[]): void {
+  mkdirSync(DATA_DIR, { recursive: true });
+  writeFileSync(DATA_FILE, JSON.stringify(tickets, null, 2));
+}
+
+function nextId(tickets: Ticket[]): string {
+  const max = tickets.reduce((m, t) => {
+    const n = parseInt(t.id.replace(/^CD-/, ""), 10);
+    return Number.isFinite(n) && n > m ? n : m;
+  }, 1000);
+  return `CD-${max + 1}`;
+}
 
 export function getTickets(): Ticket[] {
   // Newest first.
-  return [...tickets].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return readAll().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 export function getOpenTickets(): Ticket[] {
@@ -71,8 +99,9 @@ export function addTicket(input: {
   subject: string;
   description: string;
 }): Ticket {
+  const tickets = readAll();
   const ticket: Ticket = {
-    id: `CD-${counter++}`,
+    id: nextId(tickets),
     name: input.name,
     email: input.email,
     subject: input.subject,
@@ -81,10 +110,38 @@ export function addTicket(input: {
     createdAt: new Date().toISOString(),
   };
   tickets.push(ticket);
+  writeAll(tickets);
   return ticket;
 }
 
 export function setTicketStatus(id: string, status: TicketStatus): void {
+  const tickets = readAll();
   const ticket = tickets.find((t) => t.id === id);
-  if (ticket) ticket.status = status;
+  if (ticket) {
+    ticket.status = status;
+    writeAll(tickets);
+  }
+}
+
+// --- Slack notification (mock) -------------------------------------------
+// In the real build this posts to a Slack Incoming Webhook. For the demo we
+// just log so you can see where it fires. Swap the body for a fetch() to
+// process.env.SLACK_WEBHOOK_URL when we go live.
+async function notifySlack(message: string): Promise<void> {
+  console.log(`[slack] ${message}`);
+}
+
+// Shared create-path used by both the on-site form (server action) and the
+// embeddable widget (API route), so the Slack notification fires the same way.
+export async function submitTicket(input: {
+  name: string;
+  email: string;
+  subject: string;
+  description: string;
+}): Promise<Ticket> {
+  const ticket = addTicket(input);
+  await notifySlack(
+    `🎫 New support ticket ${ticket.id} from ${ticket.name}: "${ticket.subject}"`,
+  );
+  return ticket;
 }

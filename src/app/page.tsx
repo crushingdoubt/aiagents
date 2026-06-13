@@ -29,6 +29,12 @@ export default function Home() {
         >
           Team dashboard
         </Link>
+        <Link
+          href="/embed"
+          className="rounded-lg border border-zinc-300 bg-white px-6 py-3 text-base font-medium text-zinc-800 shadow-sm transition hover:bg-zinc-100"
+        >
+          Embed widget
+        </Link>
       </div>
 
       <p className="text-xs text-zinc-400">
