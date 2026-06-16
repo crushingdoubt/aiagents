@@ -4,9 +4,9 @@ import { StatusButton } from "./StatusButton";
 
 export const dynamic = "force-dynamic";
 
-export default function DashboardPage() {
-  const open = getOpenTickets();
-  const closed = getClosedTickets();
+export default async function DashboardPage() {
+  const open = await getOpenTickets();
+  const closed = await getClosedTickets();
 
   return (
     <main className="flex flex-1 flex-col bg-zinc-50 px-6 py-12">

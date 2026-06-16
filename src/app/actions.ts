@@ -25,6 +25,6 @@ export async function updateStatus(
   id: string,
   status: TicketStatus,
 ): Promise<void> {
-  setTicketStatus(id, status);
+  await setTicketStatus(id, status);
   revalidatePath("/dashboard");
 }
