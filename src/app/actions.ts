@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { submitTicket, setTicketStatus, type TicketStatus } from "@/lib/tickets";
 
 export async function createTicket(formData: FormData): Promise<void> {
@@ -16,9 +15,7 @@ export async function createTicket(formData: FormData): Promise<void> {
   }
 
   await submitTicket({ name, email, subject, description, support_type });
-
   revalidatePath("/dashboard");
-  redirect("/submit?success=1");
 }
 
 export async function updateStatus(
