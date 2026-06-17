@@ -9,13 +9,13 @@ export async function createTicket(formData: FormData): Promise<void> {
   const email = String(formData.get("email") ?? "").trim();
   const subject = String(formData.get("subject") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
+  const support_type = String(formData.get("support_type") ?? "").trim();
 
-  if (!name || !email || !subject || !description) {
-    // Basic guard; the form also uses required HTML attributes.
+  if (!name || !email || !subject || !description || !support_type) {
     throw new Error("All fields are required.");
   }
 
-  await submitTicket({ name, email, subject, description });
+  await submitTicket({ name, email, subject, description, support_type });
 
   revalidatePath("/dashboard");
   redirect("/submit?success=1");

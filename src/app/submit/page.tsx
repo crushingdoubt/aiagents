@@ -38,6 +38,25 @@ export default async function SubmitPage({
 
           <div className="space-y-1.5">
             <label
+              htmlFor="support_type"
+              className="block text-sm font-medium text-zinc-800"
+            >
+              Support type
+            </label>
+            <select
+              id="support_type"
+              name="support_type"
+              required
+              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 shadow-sm outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
+            >
+              <option value="">Select a type…</option>
+              <option value="Technical">Technical</option>
+              <option value="Billing">Billing</option>
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label
               htmlFor="description"
               className="block text-sm font-medium text-zinc-800"
             >

@@ -25,19 +25,21 @@ export async function POST(request: Request) {
     );
   }
 
-  const { name, email, message } = (body ?? {}) as {
+  const { name, email, message, support_type } = (body ?? {}) as {
     name?: string;
     email?: string;
     message?: string;
+    support_type?: string;
   };
 
   const cleanName = (name ?? "").trim();
   const cleanEmail = (email ?? "").trim();
   const cleanMessage = (message ?? "").trim();
+  const cleanType = (support_type ?? "").trim();
 
-  if (!cleanName || !cleanEmail || !cleanMessage) {
+  if (!cleanName || !cleanEmail || !cleanMessage || !cleanType) {
     return Response.json(
-      { error: "name, email, and message are required" },
+      { error: "name, email, support_type, and message are required" },
       { status: 400, headers: corsHeaders },
     );
   }
@@ -45,12 +47,12 @@ export async function POST(request: Request) {
   const ticket = await submitTicket({
     name: cleanName,
     email: cleanEmail,
-    // The widget collects a single message; derive a short subject from it.
     subject:
       cleanMessage.length > 60
         ? `${cleanMessage.slice(0, 60)}…`
         : cleanMessage,
     description: cleanMessage,
+    support_type: cleanType,
   });
 
   return Response.json(

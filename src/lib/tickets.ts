@@ -13,6 +13,7 @@ export type Ticket = {
   email: string;
   subject: string;
   description: string;
+  support_type: string;
   status: TicketStatus;
   createdAt: string;
 };
@@ -23,6 +24,7 @@ type Row = {
   email: string;
   subject: string;
   description: string;
+  support_type: string;
   status: TicketStatus;
   created_at: string;
 };
@@ -34,6 +36,7 @@ function rowToTicket(row: Row): Ticket {
     email: row.email,
     subject: row.subject,
     description: row.description,
+    support_type: row.support_type,
     status: row.status,
     createdAt: row.created_at,
   };
@@ -101,6 +104,7 @@ export async function submitTicket(input: {
   email: string;
   subject: string;
   description: string;
+  support_type: string;
 }): Promise<Ticket> {
   const { data, error } = await supabase
     .from("tickets")

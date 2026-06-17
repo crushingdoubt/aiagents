@@ -99,7 +99,7 @@ function Section({
                   </h3>
                   <p className="mt-1 text-sm text-zinc-600">{t.description}</p>
                   <p className="mt-2 text-xs text-zinc-400">
-                    {t.name} · {t.email} ·{" "}
+                    {t.name} · {t.email} · {t.support_type} ·{" "}
                     {new Date(t.createdAt).toLocaleString()}
                   </p>
                 </div>

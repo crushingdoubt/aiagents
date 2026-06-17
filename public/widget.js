@@ -67,6 +67,7 @@
     '<form class="cd-form">' +
     '<label>Name</label><input name="name" required>' +
     '<label>Email</label><input name="email" type="email" required>' +
+    '<label>Support type</label><select name="support_type" required><option value="">Select a type…</option><option value="Technical">Technical</option><option value="Billing">Billing</option></select>' +
     '<label>How can we help?</label><textarea name="message" rows="3" required></textarea>' +
     '<button class="cd-send" type="submit">Send</button>' +
     "</form></div>";
