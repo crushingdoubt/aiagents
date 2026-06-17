@@ -82,18 +82,101 @@ export async function setTicketStatus(
   if (error) throw new Error(error.message);
 }
 
-async function notifySlack(message: string): Promise<void> {
+async function notifySlackNewTicket(ticket: Ticket): Promise<void> {
   const urls = [
     process.env.SLACK_WEBHOOK_URL_1,
     process.env.SLACK_WEBHOOK_URL_2,
   ].filter(Boolean) as string[];
+
+  const body = {
+    text: `New support ticket from ${ticket.name}: "${ticket.subject}"`,
+    blocks: [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `*🎫 New Support Ticket*\n*From:* ${ticket.name} (${ticket.email})\n*Type:* ${ticket.support_type}\n*Subject:* ${ticket.subject}\n*Message:* ${ticket.description}`,
+        },
+      },
+      {
+        type: "actions",
+        block_id: `ticket_actions_${ticket.id}`,
+        elements: [
+          {
+            type: "button",
+            text: { type: "plain_text", text: "✅ Close Ticket" },
+            style: "primary",
+            action_id: "close_ticket",
+            value: ticket.id,
+            confirm: {
+              title: { type: "plain_text", text: "Close this ticket?" },
+              text: { type: "plain_text", text: "This will mark the ticket as closed in the dashboard." },
+              confirm: { type: "plain_text", text: "Yes, close it" },
+              deny: { type: "plain_text", text: "Cancel" },
+            },
+          },
+        ],
+      },
+    ],
+  };
 
   await Promise.all(
     urls.map((url) =>
       fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: message }),
+        body: JSON.stringify(body),
+      }),
+    ),
+  );
+}
+
+export async function notifySlackMorningBrief(tickets: Ticket[]): Promise<void> {
+  const urls = [
+    process.env.SLACK_WEBHOOK_URL_1,
+    process.env.SLACK_WEBHOOK_URL_2,
+  ].filter(Boolean) as string[];
+
+  const lines = tickets.map(
+    (t) => `• *${t.subject}* — ${t.name} (${t.support_type}) — <${process.env.NEXT_PUBLIC_SUPABASE_URL ? `https://support.crushingdoubt.com/dashboard` : "#"}|View>`,
+  );
+
+  const body = {
+    text: `Good morning! ${tickets.length} open ticket${tickets.length === 1 ? "" : "s"} to review.`,
+    blocks: [
+      {
+        type: "header",
+        text: { type: "plain_text", text: "☀️ Morning Support Briefing" },
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: tickets.length === 0
+            ? "No open tickets. Great work! 🎉"
+            : `*${tickets.length} open ticket${tickets.length === 1 ? "" : "s"}:*\n${lines.join("\n")}`,
+        },
+      },
+      {
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            text: { type: "plain_text", text: "Open Dashboard" },
+            url: "https://support.crushingdoubt.com/dashboard",
+            action_id: "open_dashboard",
+          },
+        ],
+      },
+    ],
+  };
+
+  await Promise.all(
+    urls.map((url) =>
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
       }),
     ),
   );
@@ -113,8 +196,6 @@ export async function submitTicket(input: {
     .single();
   if (error) throw new Error(error.message);
   const ticket = rowToTicket(data as Row);
-  await notifySlack(
-    `🎫 New support ticket from ${ticket.name}: "${ticket.subject}"`,
-  );
+  await notifySlackNewTicket(ticket);
   return ticket;
 }
