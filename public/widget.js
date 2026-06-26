@@ -83,7 +83,7 @@
     '<label class="cd-label">Screenshot <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>' +
     '<label class="cd-file-label">' +
     '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>' +
-    '<span class="cd-file-text">Choose a screenshot…</span>' +
+    '<span class="cd-file-text">Upload a screenshot…</span>' +
     '<input class="cd-file-input" type="file" accept="image/*">' +
     '</label>' +
     '</div>' +
@@ -114,7 +114,7 @@
   var fileInput = panel.querySelector(".cd-file-input");
   var fileText = panel.querySelector(".cd-file-text");
   fileInput.addEventListener("change", function () {
-    fileText.textContent = fileInput.files[0] ? fileInput.files[0].name : "Choose a screenshot…";
+    fileText.textContent = fileInput.files[0] ? fileInput.files[0].name : "Upload a screenshot…";
   });
 
   var form = panel.querySelector(".cd-form");

@@ -82,7 +82,7 @@ export default function SubmitPage() {
 
             <div className="space-y-2">
               <label htmlFor="screenshot" className="block text-sm font-medium text-zinc-700">
-                Screenshot <span className="font-normal text-zinc-400">(optional)</span>
+                Upload a screenshot <span className="font-normal text-zinc-400">(optional)</span>
               </label>
               <input
                 id="screenshot"
