@@ -80,6 +80,19 @@ export default function SubmitPage() {
               />
             </div>
 
+            <div className="space-y-2">
+              <label htmlFor="screenshot" className="block text-sm font-medium text-zinc-700">
+                Screenshot <span className="font-normal text-zinc-400">(optional)</span>
+              </label>
+              <input
+                id="screenshot"
+                name="screenshot"
+                type="file"
+                accept="image/*"
+                className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 shadow-sm file:mr-3 file:rounded file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-zinc-700 hover:file:bg-zinc-200"
+              />
+            </div>
+
             <button
               type="submit"
               disabled={isPending}

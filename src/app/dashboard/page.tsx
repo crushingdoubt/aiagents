@@ -98,6 +98,21 @@ function Section({
                     {t.subject}
                   </h3>
                   <p className="mt-1 text-sm text-zinc-600">{t.description}</p>
+                  {t.screenshot_url && (
+                    <a
+                      href={t.screenshot_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 block"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={t.screenshot_url}
+                        alt="Screenshot"
+                        className="max-h-48 rounded-lg border border-zinc-200 object-contain"
+                      />
+                    </a>
+                  )}
                   <p className="mt-2 text-xs text-zinc-400">
                     {t.name} · {t.email} · {t.support_type} ·{" "}
                     {new Date(t.createdAt).toLocaleString()}

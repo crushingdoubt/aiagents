@@ -16,6 +16,7 @@ export type Ticket = {
   support_type: string;
   status: TicketStatus;
   createdAt: string;
+  screenshot_url: string | null;
 };
 
 type Row = {
@@ -27,6 +28,7 @@ type Row = {
   support_type: string;
   status: TicketStatus;
   created_at: string;
+  screenshot_url: string | null;
 };
 
 function rowToTicket(row: Row): Ticket {
@@ -39,6 +41,7 @@ function rowToTicket(row: Row): Ticket {
     support_type: row.support_type,
     status: row.status,
     createdAt: row.created_at,
+    screenshot_url: row.screenshot_url ?? null,
   };
 }
 
@@ -95,7 +98,7 @@ async function notifySlackNewTicket(ticket: Ticket): Promise<void> {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `*🎫 New Support Ticket*\n*From:* ${ticket.name} (${ticket.email})\n*Type:* ${ticket.support_type}\n*Subject:* ${ticket.subject}\n*Message:* ${ticket.description}`,
+          text: `*🎫 New Support Ticket*\n*From:* ${ticket.name} (${ticket.email})\n*Type:* ${ticket.support_type}\n*Subject:* ${ticket.subject}\n*Message:* ${ticket.description}${ticket.screenshot_url ? `\n*Screenshot:* <${ticket.screenshot_url}|View image>` : ""}`,
         },
       },
       {
@@ -182,16 +185,28 @@ export async function notifySlackMorningBrief(tickets: Ticket[]): Promise<void> 
   );
 }
 
+export async function uploadScreenshot(file: Buffer, filename: string, mimeType: string): Promise<string> {
+  const ext = filename.split(".").pop() ?? "png";
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  const { error } = await supabase.storage
+    .from("screenshots")
+    .upload(path, file, { contentType: mimeType, upsert: false });
+  if (error) throw new Error(error.message);
+  const { data } = supabase.storage.from("screenshots").getPublicUrl(path);
+  return data.publicUrl;
+}
+
 export async function submitTicket(input: {
   name: string;
   email: string;
   subject: string;
   description: string;
   support_type: string;
+  screenshot_url?: string | null;
 }): Promise<Ticket> {
   const { data, error } = await supabase
     .from("tickets")
-    .insert([{ ...input, status: "open" }])
+    .insert([{ ...input, status: "open", screenshot_url: input.screenshot_url ?? null }])
     .select()
     .single();
   if (error) throw new Error(error.message);

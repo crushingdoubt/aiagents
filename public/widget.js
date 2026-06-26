@@ -13,6 +13,7 @@
     })();
   var base = new URL(self.src);
   var apiUrl = base.origin + "/api/tickets";
+  var uploadUrl = base.origin + "/api/upload";
 
   var BRAND = "#dc2626";
 
@@ -42,6 +43,11 @@
     ".cd-tab{flex:1;padding:8px;border:1.5px solid #e4e4e7;border-radius:8px;background:#fafafa;font:600 13px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#71717a;cursor:pointer;transition:all .15s;text-align:center}" +
     ".cd-tab:hover{border-color:#d4d4d8;color:#3f3f46}" +
     ".cd-tab.active{border-color:" + BRAND + ";background:rgba(220,38,38,.06);color:" + BRAND + "}" +
+    ".cd-file-label{display:flex;align-items:center;gap:8px;border:1.5px dashed #e4e4e7;border-radius:8px;padding:9px 12px;cursor:pointer;background:#fafafa;transition:border-color .15s}" +
+    ".cd-file-label:hover{border-color:#d4d4d8}" +
+    ".cd-file-label svg{width:14px;height:14px;flex-shrink:0;stroke:#a1a1aa;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}" +
+    ".cd-file-text{font-size:13px;color:#a1a1aa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
+    ".cd-file-input{display:none}" +
     ".cd-send{margin-top:14px;width:100%;background:" + BRAND + ";color:#fff;border:none;border-radius:8px;padding:11px;font:600 14px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;cursor:pointer;transition:opacity .15s,transform .1s}" +
     ".cd-send:hover{opacity:.9}" +
     ".cd-send:active{transform:scale(.98)}" +
@@ -73,6 +79,14 @@
     '<div class="cd-field"><label class="cd-label">Email</label><input class="cd-input" name="email" type="email" placeholder="jane@example.com" required></div>' +
     '<div class="cd-field"><label class="cd-label">Support type</label><div class="cd-tabs"><button type="button" class="cd-tab active" data-type="Technical">Technical</button><button type="button" class="cd-tab" data-type="Billing">Billing</button></div><input type="hidden" name="support_type" value="Technical"></div>' +
     '<div class="cd-field"><label class="cd-label">Message</label><textarea class="cd-input" name="message" rows="3" placeholder="Describe your issue…" required></textarea></div>' +
+    '<div class="cd-field">' +
+    '<label class="cd-label">Screenshot <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>' +
+    '<label class="cd-file-label">' +
+    '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>' +
+    '<span class="cd-file-text">Choose a screenshot…</span>' +
+    '<input class="cd-file-input" type="file" accept="image/*">' +
+    '</label>' +
+    '</div>' +
     '<button class="cd-send" type="submit">Send message</button>' +
     "</form></div>";
 
@@ -97,6 +111,12 @@
     });
   });
 
+  var fileInput = panel.querySelector(".cd-file-input");
+  var fileText = panel.querySelector(".cd-file-text");
+  fileInput.addEventListener("change", function () {
+    fileText.textContent = fileInput.files[0] ? fileInput.files[0].name : "Choose a screenshot…";
+  });
+
   var form = panel.querySelector(".cd-form");
   form.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -104,27 +124,53 @@
     btn.disabled = true;
     btn.textContent = "Sending…";
 
-    var payload = {
-      name: form.name.value.trim(),
-      email: form.email.value.trim(),
-      support_type: hiddenType.value,
-      message: form.message.value.trim(),
-    };
+    var file = fileInput.files && fileInput.files[0];
 
-    fetch(apiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    })
-      .then(function (r) {
-        if (!r.ok) throw new Error("Request failed");
-        panel.querySelector(".cd-body").innerHTML =
-          '<div class="cd-ok"><div class="cd-ok-icon">✅</div><p class="cd-ok-title">Message sent!</p><p class="cd-ok-sub">We\'ll get back to you shortly.</p></div>';
+    function submitWithUrl(screenshotUrl) {
+      var payload = {
+        name: form.name.value.trim(),
+        email: form.email.value.trim(),
+        support_type: hiddenType.value,
+        message: form.message.value.trim(),
+        screenshot_url: screenshotUrl || null,
+      };
+
+      fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       })
-      .catch(function () {
-        btn.disabled = false;
-        btn.textContent = "Send message";
-        alert("Sorry, something went wrong. Please try again.");
-      });
+        .then(function (r) {
+          if (!r.ok) throw new Error("Request failed");
+          panel.querySelector(".cd-body").innerHTML =
+            '<div class="cd-ok"><div class="cd-ok-icon">✅</div><p class="cd-ok-title">Message sent!</p><p class="cd-ok-sub">We\'ll get back to you shortly.</p></div>';
+        })
+        .catch(function () {
+          btn.disabled = false;
+          btn.textContent = "Send message";
+          alert("Sorry, something went wrong. Please try again.");
+        });
+    }
+
+    if (file) {
+      btn.textContent = "Uploading…";
+      var fd = new FormData();
+      fd.append("file", file);
+      fetch(uploadUrl, { method: "POST", body: fd })
+        .then(function (r) {
+          if (!r.ok) throw new Error("Upload failed");
+          return r.json();
+        })
+        .then(function (data) {
+          submitWithUrl(data.url);
+        })
+        .catch(function () {
+          btn.disabled = false;
+          btn.textContent = "Send message";
+          alert("Sorry, the screenshot upload failed. Please try again.");
+        });
+    } else {
+      submitWithUrl(null);
+    }
   });
 })();
